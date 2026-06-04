@@ -19,7 +19,8 @@ export function TopBar({ onLogoClick }: TopBarProps) {
         {/* Left: PlotVerse Logo */}
         <button 
           onClick={onLogoClick}
-          className="flex items-center gap-3 pointer-events-auto hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 pointer-events-auto hover:scale-[1.02] active:scale-[0.98] transition-transform px-4 py-2.5 rounded-2xl glass shadow-lg"
+          style={{ background: "rgba(10, 10, 10, 0.7)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)" }}
         >
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 10l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
