@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// Placeholder Firestore security rules for local emulator + integration tests.
+// Tighten these before any production deployment (see Requirement 32).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Projects and their subcollections (plots, zones, statusGroups) are
+    // publicly readable for the viewer; writes are restricted to admins.
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+
+      match /{document=**} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
+    }
+
+    // Leads are created by public enquiry submissions but only readable/
+    // manageable by authenticated admins/agents.
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Default deny for anything not matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

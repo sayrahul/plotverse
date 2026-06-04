@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Placeholder Storage security rules for local emulator + integration tests.
+// Tighten these before any production deployment (see Requirement 32).
+service firebase.storage {
+  match /b/{bucket}/o {
+    // GeoJSON files and gallery media are publicly readable for the viewer;
+    // writes are restricted to authenticated admins.
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
