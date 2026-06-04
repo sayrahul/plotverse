@@ -10,8 +10,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { toast } from "react-hot-toast";
 import type { Project } from "@/lib/types";
 
-const APP_DOMAIN =
-  process.env.NEXT_PUBLIC_APP_DOMAIN ?? "https://yourdomain.com";
+const APP_DOMAIN = "https://plotverse.proventure.in";
 
 interface ShareModalProps {
   project:         Project;
@@ -29,7 +28,7 @@ export function ShareModal({
   const [includeFilter, setIncludeFilter] = useState(!!activeStatusId);
   const [copied, setCopied]               = useState(false);
 
-  const baseUrl = `${APP_DOMAIN}/${project.id}`;
+  const baseUrl = APP_DOMAIN;
   const params  = new URLSearchParams();
   if (includeFilter && activeStatusId) params.set("status", activeStatusId);
   if (activePlotNum) params.set("plot", activePlotNum);

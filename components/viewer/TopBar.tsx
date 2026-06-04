@@ -16,7 +16,7 @@ export function TopBar({ onLogoClick }: TopBarProps) {
     <div className="w-full flex flex-col pointer-events-none px-4 pt-4">
       {/* Header Row */}
       <div className="flex items-center justify-between w-full">
-        {/* Left: Nakshatra Logo */}
+        {/* Left: PlotVerse Logo */}
         <button 
           onClick={onLogoClick}
           className="flex items-center gap-3 pointer-events-auto hover:opacity-80 transition-opacity"
@@ -29,7 +29,7 @@ export function TopBar({ onLogoClick }: TopBarProps) {
             className="text-2xl font-bold tracking-wider" 
             style={{ color: "#f97316", fontFamily: "var(--font-display)" }}
           >
-            NAKSHATRA
+            PLOTVERSE
           </span>
         </button>
         

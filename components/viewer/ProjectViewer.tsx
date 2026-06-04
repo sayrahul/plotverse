@@ -44,8 +44,7 @@ const MapRenderer = dynamic(
   { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#000" }} /> },
 );
 
-const APP_DOMAIN =
-  process.env.NEXT_PUBLIC_APP_DOMAIN ?? "https://yourdomain.com";
+
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -264,8 +263,8 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
         {/* Left Side: Status Toggle */}
         <StatusToggle showColors={showStatusColors} onToggle={setShowStatusColors} />
 
-        {/* Right Side: Floating Action Buttons */}
-        <div className="flex flex-row gap-3 pointer-events-auto">
+        {/* Right Side: Floating Action Buttons (Vertical stack for mobile responsiveness) */}
+        <div className="flex flex-col gap-3 pointer-events-auto items-end">
           <button
             type="button"
             className="w-12 h-12 rounded-full glass flex items-center justify-center text-white"

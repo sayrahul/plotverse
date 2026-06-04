@@ -10,8 +10,7 @@ import { QRCodeSVG } from "qrcode.react";
 import type { Project } from "@/lib/types";
 import type { PlotCounts } from "@/hooks/usePlots";
 
-const APP_DOMAIN =
-  process.env.NEXT_PUBLIC_APP_DOMAIN ?? "https://yourdomain.com";
+const APP_DOMAIN = "https://plotverse.proventure.in";
 
 interface ProjectInfoPanelProps {
   project: Project;
@@ -60,7 +59,7 @@ const STATUS_LABELS = [
 
 export function ProjectInfoPanel({ project, counts, onClose }: ProjectInfoPanelProps) {
   const [expanded, setExpanded] = useState(false);
-  const projectUrl = `${APP_DOMAIN}/${project.id}`;
+  const projectUrl = APP_DOMAIN;
   const [lng, lat]  = project.center as [number, number];
 
   async function handleShare() {
@@ -97,33 +96,33 @@ export function ProjectInfoPanel({ project, counts, onClose }: ProjectInfoPanelP
           <X size={20} />
         </button>
 
-        {/* Nakshatra Header */}
+        {/* PlotVerse Header */}
         <div className="flex items-center gap-3 mb-6">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 10l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           <span className="text-xl font-bold tracking-wider" style={{ color: "#f97316", fontFamily: "var(--font-display)" }}>
-            NAKSHATRA
+            PLOTVERSE
           </span>
         </div>
 
         {/* Description */}
         <p className="text-[15px] text-white/80 leading-relaxed mb-6">
-          Nakshatra offers well-planned 109 residential plots in a peaceful setting. The Lifestyle you deserve
+          PlotVerse offers well-planned 109 residential plots in a peaceful setting. The Lifestyle you deserve
         </p>
 
         {/* Instagram button */}
-        <button className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-6 hover:bg-white/5">
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-6 hover:bg-white/5">
           <Camera size={20} className="text-white/70" />
-        </button>
+        </a>
 
         <div className="w-full h-px bg-white/10 mb-6" />
 
         {/* Other projects */}
         <h4 className="text-sm font-semibold text-white/90 mb-4">Other projects by same developer :</h4>
         
-        <div className="relative rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] p-4 flex items-center justify-center h-28 cursor-pointer hover:border-white/20 transition-colors">
+        <a href="#" className="relative rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] p-4 flex items-center justify-center h-28 cursor-pointer hover:border-white/20 transition-colors block w-full">
           <button className="absolute top-2 right-2 text-white/50"><Share2 size={14} /></button>
           
           <div className="flex flex-col items-center">
@@ -141,7 +140,7 @@ export function ProjectInfoPanel({ project, counts, onClose }: ProjectInfoPanelP
           <div className="absolute bottom-3 right-4 text-[8px] text-white/40 text-right leading-tight">
             NEXT GEN<br/>PLOT VIEWING
           </div>
-        </div>
+        </a>
 
         <div className="mt-8 text-[11px] text-white/40">
           Powered by Spacer Engine | SKILLHOUSE
