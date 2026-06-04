@@ -45,6 +45,7 @@ import {
   PLOTS_SOURCE_ID,
   ZONES_SOURCE_ID,
   buildPlotFilter,
+  plotFillColorExpression,
 } from "@/lib/map/layers";
 import type { LabelFormat, Plot, Project, Unit, Zone } from "@/lib/types";
 import type { StatusFilter } from "@/lib/filters";
@@ -74,6 +75,8 @@ export interface MapRendererHandle {
   fitBounds(): void;
   /** Update the GPS user-location dot. */
   setUserLocation(loc: UserLocation | null): void;
+  /** Toggle status color shading on plots. */
+  setStatusColorsEnabled(enable: boolean): void;
 }
 
 export interface MapRendererProps {
@@ -299,6 +302,11 @@ function MapRendererImpl(
       map.fitBounds(bounds, { padding: 60, maxZoom: 18, duration: 800 });
     },
     setUserLocation(loc) { updateUserDot(loc); },
+    setStatusColorsEnabled(enable) {
+      const map = mapRef.current;
+      if (!map || !styleReadyRef.current) return;
+      map.setPaintProperty(LAYER_IDS.plotFill, "fill-color", plotFillColorExpression(enable));
+    },
   }), []);
 
   // ── Map initialization ──────────────────────────────────────────────────

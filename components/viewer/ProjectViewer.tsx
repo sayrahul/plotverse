@@ -27,14 +27,13 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import { pointInPolygon }  from "@/lib/geo/turfUtils";
 
 import { TopBar }             from "@/components/viewer/TopBar";
-import { FilterPills }        from "@/components/viewer/FilterPills";
+import { StatusToggle }       from "@/components/viewer/StatusToggle";
 import { SearchPlot }         from "@/components/viewer/SearchPlot";
 import { BottomTabBar, type ActiveTab } from "@/components/viewer/BottomTabBar";
 import { PlotDetailSheet }    from "@/components/viewer/PlotDetailSheet";
 import { GalleryPanel }       from "@/components/viewer/GalleryPanel";
 import { ProjectInfoPanel }   from "@/components/viewer/ProjectInfoPanel";
 import { ShareModal }         from "@/components/viewer/ShareModal";
-import { WhatsAppFAB }        from "@/components/viewer/WhatsAppFAB";
 import { AddToHomeScreenPrompt } from "@/components/pwa/AddToHomeScreenPrompt";
 
 import type { MapRendererHandle } from "@/components/viewer/MapRenderer";
@@ -93,18 +92,17 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
   // UI state
   const [selectedPlot,     setSelectedPlot]     = useState<Plot | null>(null);
-  const [activeFilter,     setActiveFilter]      = useState<string>("all");
   const [activeTab,        setActiveTab]         = useState<ActiveTab>(null);
   const [is3D,             setIs3D]              = useState(false);
   const [isPresentation,   setIsPresentation]    = useState(false);
   const [showShareModal,   setShowShareModal]    = useState(false);
   const [mapStyleKey,      setMapStyleKey]       = useState<"satellite" | "street">("satellite");
+  const [showStatusColors, setShowStatusColors]  = useState(false);
 
   // ── Initial URL params ───────────────────────────────────────────────────
 
   useEffect(() => {
     const state = decodeViewerState(searchParams);
-    if (state.status) setActiveFilter(state.status);
     if (state.view === "3d") { setIs3D(true); mapRef.current?.toggle3D(true); }
     if (state.tab === "gallery") setActiveTab("gallery");
     // Plot param handled after plots load (below)
@@ -123,12 +121,11 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
     mapRef.current?.fitBounds();
   }, [loading]);  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Apply filter to map when it changes ─────────────────────────────────
+  // ── Apply status colors when toggled ────────────────────────────────────
 
   useEffect(() => {
-    const { statusFilter, zoneId } = computeFilterValue(activeFilter, plots, zones, statusGroups);
-    mapRef.current?.applyFilter(statusFilter, zoneId);
-  }, [activeFilter, plots, zones, statusGroups]);
+    mapRef.current?.setStatusColorsEnabled(showStatusColors);
+  }, [showStatusColors]);
 
   // ── Real-time plot updates → map source ─────────────────────────────────
 
@@ -191,15 +188,6 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
     updateURLParam("plot", undefined);
   }, []);
 
-  const handleFilterSelect = useCallback((value: string) => {
-    setActiveFilter(value);
-    // If value is a statusGroup id, set status= param; else clear it
-    const sg = statusGroups.find((g) => g.id === value);
-    if (sg) updateURLParam("status", value);
-    else    updateURLParam("status", undefined);
-    updateURLParam("zone", undefined);
-  }, [statusGroups]);
-
   const handleTabChange = useCallback((tab: ActiveTab) => {
     setActiveTab(tab);
     updateURLParam("tab", tab === "gallery" ? "gallery" : undefined);
@@ -223,6 +211,12 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
     updateURLParam("view", next ? "3d" : undefined);
   }, [is3D]);
 
+  const handleToggleMapStyle = useCallback(() => {
+    const nextStyle = mapStyleKey === "satellite" ? "street" : "satellite";
+    setMapStyleKey(nextStyle);
+    mapRef.current?.switchStyle(nextStyle);
+  }, [mapStyleKey]);
+
   function handlePlotClick(plotId: string) {
     const plot = plots.find((p) => p.id === plotId);
     if (plot) selectPlot(plot);
@@ -232,9 +226,11 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
     ? zones.find((z) => z.id === selectedPlot.zoneId)?.name
     : undefined;
 
-  const activeStatusGroupId = statusGroups.find((g) => g.id === activeFilter)?.id;
-
   // ── Render ────────────────────────────────────────────────────────────────
+
+  if (!project) {
+    return <div style={{ width: "100%", height: "100%", background: "#000" }} />;
+  }
 
   return (
     <main
@@ -260,26 +256,53 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
       {/* Top Header Overlay (Notch Safe / No overlap) */}
       <div className="ui-overlay absolute top-0 left-0 right-0 z-20 flex flex-col pointer-events-none pt-safe">
-        <TopBar
-          projectName={project.name}
-          is3D={is3D}
-          isPresentation={isPresentation}
-          onShare={() => setShowShareModal(true)}
-          onToggle3D={handleToggle3D}
-          onLocate={() => mapRef.current?.flyToCenter()}
-          onTogglePresentation={() => setIsPresentation((p) => !p)}
-        />
-        <FilterPills
-          counts={counts}
-          zones={zones}
-          statusGroups={statusGroups}
-          active={activeFilter}
-          onSelect={handleFilterSelect}
-        />
+        <TopBar onLogoClick={() => setActiveTab("info")} />
+      </div>
+
+      {/* Floating Buttons: Status Toggle (Bottom Left) and FABs (Bottom Right) */}
+      <div className="ui-overlay absolute bottom-[140px] left-0 right-0 z-20 px-4 pointer-events-none flex justify-between items-end">
+        {/* Left Side: Status Toggle */}
+        <StatusToggle showColors={showStatusColors} onToggle={setShowStatusColors} />
+
+        {/* Right Side: Floating Action Buttons */}
+        <div className="flex flex-row gap-3 pointer-events-auto">
+          <button
+            type="button"
+            className="w-12 h-12 rounded-full glass flex items-center justify-center text-white"
+            style={{ background: "rgba(30, 30, 30, 0.8)", border: "none" }}
+            onClick={() => setShowShareModal(true)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          </button>
+          <button
+            type="button"
+            className="w-12 h-12 rounded-full glass flex items-center justify-center text-white"
+            style={{ background: "rgba(30, 30, 30, 0.8)", border: "none" }}
+            onClick={handleToggleMapStyle}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          </button>
+          <button
+            type="button"
+            className="w-12 h-12 rounded-full glass flex items-center justify-center text-white"
+            style={{ background: is3D ? "rgba(59, 130, 246, 0.8)" : "rgba(30, 30, 30, 0.8)", border: "none" }}
+            onClick={handleToggle3D}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </button>
+          <button
+            type="button"
+            className="w-12 h-12 rounded-full glass flex items-center justify-center text-white"
+            style={{ background: "rgba(30, 30, 30, 0.8)", border: "none" }}
+            onClick={() => mapRef.current?.flyToCenter()}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </button>
+        </div>
       </div>
 
       {/* Bottom Controls Container (Home-Indicator Safe / No overlap) */}
-      <div className="ui-overlay absolute bottom-0 left-0 right-0 z-20 flex flex-col pointer-events-none pb-safe">
+      <div className="ui-overlay absolute bottom-0 left-0 right-0 z-20 flex flex-col pointer-events-none pb-safe pt-2 bg-gradient-to-t from-black/80 to-transparent">
         <SearchPlot
           plots={plots}
           userLocation={userLoc.location}
@@ -288,8 +311,7 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
         <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
-      {/* z-50: WhatsApp FAB (Hidden when sheets are open to avoid overlap) */}
-      {!selectedPlot && !activeTab && <WhatsAppFAB project={project} />}
+
 
       {/* z-30: Plot detail sheet */}
       {selectedPlot && (
@@ -333,7 +355,7 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
         <div style={{ position: "absolute", inset: 0, zIndex: 40, pointerEvents: "auto" }}>
           <ShareModal
             project={project}
-            activeStatusId={activeStatusGroupId}
+            activeStatusId={undefined}
             activePlotNum={selectedPlot?.number}
             onClose={() => setShowShareModal(false)}
           />

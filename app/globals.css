@@ -18,11 +18,11 @@
   --text-secondary: #888888;
   --text-muted:     #555555;
 
-  /* Plot status palette */
-  --color-available: #22c55e;
-  --color-sold:      #ef4444;
-  --color-reserved:  #f59e0b;
-  --color-blocked:   #6b7280;
+  /* Plot status palette (Nakshatra style) */
+  --color-available: #3b82f6; /* Blue */
+  --color-sold:      #ef4444; /* Red */
+  --color-reserved:  #facc15; /* Yellow (Builder) */
+  --color-blocked:   #6b7280; /* Grey */
 
   /* Brand accent */
   --color-blue:      #3b82f6;
@@ -132,12 +132,49 @@ body {
     border-radius: 50%;
     background: currentColor;
   }
-  .status-badge.available { color: var(--color-available); background: rgba(34,197,94,0.15); }
+  .status-badge.available { color: var(--color-available); background: rgba(59,130,246,0.15); }
   .status-badge.sold      { color: var(--color-sold);      background: rgba(239,68,68,0.15);  }
-  .status-badge.reserved  { color: var(--color-reserved);  background: rgba(245,158,11,0.15); }
+  .status-badge.reserved  { color: var(--color-reserved);  background: rgba(250,204,21,0.15); }
   .status-badge.blocked   { color: var(--color-blocked);   background: rgba(107,114,128,0.15);}
 
-  /* ── Filter pills ── */
+  /* ── Toggle Switch ── */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+  }
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: rgba(255,255,255,0.25);
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
   .filter-pill {
     display: inline-flex;
     align-items: center;

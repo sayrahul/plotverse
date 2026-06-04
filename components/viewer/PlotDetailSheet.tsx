@@ -10,7 +10,6 @@ import { X, Navigation, Share2, MessageCircle, ChevronDown } from "lucide-react"
 import { toast } from "react-hot-toast";
 import type { Plot, Project, Unit } from "@/lib/types";
 import { formatArea } from "@/lib/units";
-import { leadRepo } from "@/lib/firebase/repos";
 
 const STATUS_COLORS: Record<string, string> = {
   available: "var(--color-available)",
@@ -76,13 +75,8 @@ export function PlotDetailSheet({
     }
     setSubmitting(true);
     try {
-      await leadRepo.create({
-        projectId: plot.projectId,
-        plotId:    plot.id,
-        name:      name.trim(),
-        contact:   phone.trim(),
-        message:   `Enquiry from plot detail sheet for ${plot.number}.`,
-      });
+      // MOCKED: In the static version, we just pretend to send the enquiry.
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Enquiry sent! We'll contact you soon.");
       setName(""); setPhone(""); setShowForm(false);
     } catch {

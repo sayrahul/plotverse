@@ -1,19 +1,10 @@
-// Landing_Page served at the root path (Req 30.1).
-// Marketing-only RSC — no viewer/map imports.
-import { CallToAction } from "@/components/landing/CallToAction";
-import { Features }     from "@/components/landing/Features";
-import { Footer }       from "@/components/landing/Footer";
-import { Hero }         from "@/components/landing/Hero";
-import { Stats }        from "@/components/landing/Stats";
+import { Suspense } from "react";
+import { ProjectViewer } from "@/components/viewer/ProjectViewer";
 
 export default function HomePage() {
   return (
-    <main style={{ background: "var(--bg-primary)" }}>
-      <Hero />
-      <Features />
-      <Stats />
-      <CallToAction />
-      <Footer />
-    </main>
+    <Suspense fallback={<div style={{ width: "100%", height: "100%", background: "#000" }} />}>
+      <ProjectViewer projectId="single" initialProject={null as any} />
+    </Suspense>
   );
 }

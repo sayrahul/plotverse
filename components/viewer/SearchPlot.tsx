@@ -63,9 +63,9 @@ export function SearchPlot({ plots, userLocation, onSelect }: SearchPlotProps) {
       {/* Search input */}
       <div
         className="glass flex items-center gap-3 px-4 py-3"
-        style={{ borderRadius: "14px" }}
+        style={{ borderRadius: "9999px", background: "rgba(30, 30, 30, 0.8)", border: "none" }}
       >
-        <Search size={16} color="var(--text-secondary)" />
+        <Search size={18} color="var(--text-secondary)" />
         <input
           ref={inputRef}
           type="text"

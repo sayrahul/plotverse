@@ -1,0 +1,81 @@
+{
+  "project": {
+    "id": "single",
+    "name": "My Simplified PlotVerse",
+    "description": "A simplified, static plot viewer.",
+    "center": [73.8567, 18.5204],
+    "defaultZoom": 16,
+    "labelFormat": "number+area",
+    "contactPhone": "1234567890",
+    "socialLinks": {},
+    "amenities": ["Water", "Electricity"],
+    "gallery": [],
+    "geojsonStoragePath": "",
+    "geojsonHistory": [],
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000
+  },
+  "plots": [
+    {
+      "id": "plot-1",
+      "projectId": "single",
+      "number": "A1",
+      "status": "available",
+      "areaSqm": 120,
+      "centroid": [73.8567, 18.5204],
+      "price": 50000,
+      "facing": "East",
+      "amenities": ["Corner"],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.8566, 18.5203],
+            [73.8568, 18.5203],
+            [73.8568, 18.5205],
+            [73.8566, 18.5205],
+            [73.8566, 18.5203]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "plot-2",
+      "projectId": "single",
+      "number": "A2",
+      "status": "sold",
+      "areaSqm": 150,
+      "centroid": [73.8570, 18.5204],
+      "price": 60000,
+      "facing": "West",
+      "amenities": [],
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.8569, 18.5203],
+            [73.8571, 18.5203],
+            [73.8571, 18.5205],
+            [73.8569, 18.5205],
+            [73.8569, 18.5203]
+          ]
+        ]
+      }
+    }
+  ],
+  "zones": [],
+  "statusGroups": [
+    {
+      "id": "all",
+      "projectId": "single",
+      "name": "All",
+      "statuses": ["available", "sold", "reserved", "blocked"]
+    },
+    {
+      "id": "available",
+      "projectId": "single",
+      "name": "Available",
+      "statuses": ["available"]
+    }
+  ]
+}

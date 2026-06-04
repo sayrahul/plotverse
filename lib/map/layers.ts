@@ -117,7 +117,10 @@ export function statusFillColor(status: PlotStatus | string): string {
  * per Plot_Status and {@link UNKNOWN_STATUS_COLOR} as the default, so the color
  * is computed per-feature by the GPU without recreating the source on changes.
  */
-export function plotFillColorExpression(): ExpressionSpecification {
+export function plotFillColorExpression(showStatusColors: boolean = true): ExpressionSpecification {
+  if (!showStatusColors) {
+    return ["literal", "#e5ddc5"] as ExpressionSpecification; // Tan color from the screenshot when status is off
+  }
   return [
     "match",
     ["get", "status"],
@@ -329,7 +332,7 @@ export function buildPlotFillLayer(): FillLayerSpecification {
     type: "fill",
     source: PLOTS_SOURCE_ID,
     paint: {
-      "fill-color": plotFillColorExpression(),
+      "fill-color": plotFillColorExpression(true),
       "fill-opacity": plotFillOpacityExpression(),
     },
   };

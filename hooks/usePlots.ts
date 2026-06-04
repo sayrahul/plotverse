@@ -1,14 +1,5 @@
 "use client";
-/**
- * usePlots — subscribes to a project's plots via Firestore onSnapshot and
- * derives live status counts. Cleans up the subscription on unmount.
- */
-import { useEffect, useRef, useState } from "react";
-import {
-  subscribePlots,
-  subscribeZones,
-  subscribeStatusGroups,
-} from "@/lib/firebase/subscriptions";
+import { useEffect, useState } from "react";
 import type { Plot, Zone, StatusGroup, PlotStatus } from "@/lib/types";
 
 export interface PlotCounts {
@@ -41,20 +32,21 @@ export function usePlots(projectId: string): PlotsHook {
   const [zones,        setZones]        = useState<Zone[]>([]);
   const [statusGroups, setStatusGroups] = useState<StatusGroup[]>([]);
   const [loading,      setLoading]      = useState(true);
-  const firstRef = useRef(true);
 
   useEffect(() => {
-    firstRef.current = true;
     setLoading(true);
-
-    const unsubPlots = subscribePlots(projectId, (ps) => {
-      setPlots(ps);
-      if (firstRef.current) { firstRef.current = false; setLoading(false); }
-    });
-    const unsubZones  = subscribeZones(projectId, setZones);
-    const unsubGroups = subscribeStatusGroups(projectId, setStatusGroups);
-
-    return () => { unsubPlots(); unsubZones(); unsubGroups(); };
+    fetch("/data/plot-data.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setPlots(data.plots || []);
+        setZones(data.zones || []);
+        setStatusGroups(data.statusGroups || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load plot data", err);
+        setLoading(false);
+      });
   }, [projectId]);
 
   return {

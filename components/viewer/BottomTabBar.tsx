@@ -20,32 +20,28 @@ const TABS = [
 
 export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
   return (
-    <div
-      className="w-full glass-dark px-4"
-      style={{ borderTop: "var(--glass-border)", borderRadius: "20px 20px 0 0" }}
-    >
-      <div className="flex items-center justify-around py-2">
-        {TABS.map(({ id, label, Icon }) => {
-          const isActive = activeTab === id;
-          return (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onTabChange(isActive ? null : (id as ActiveTab))}
-              className="flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-colors"
-              style={{
-                color: isActive ? "#fff" : "var(--text-secondary)",
-                background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
-              }}
-              aria-label={label}
-              aria-pressed={isActive}
-            >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className="text-[11px] font-semibold">{label}</span>
-            </button>
-          );
-        })}
-      </div>
+    <div className="w-full flex items-center justify-center gap-3 px-4 pb-2 pointer-events-auto">
+      {TABS.map(({ id, label, Icon }) => {
+        const isActive = activeTab === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onTabChange(isActive ? null : (id as ActiveTab))}
+            className="flex items-center gap-2 px-5 py-3 rounded-full transition-colors flex-1 justify-center"
+            style={{
+              color: isActive ? "#fff" : "var(--text-secondary)",
+              background: isActive ? "rgba(255,255,255,0.15)" : "rgba(30, 30, 30, 0.8)",
+              border: isActive ? "1px solid rgba(255,255,255,0.3)" : "none",
+            }}
+            aria-label={label}
+            aria-pressed={isActive}
+          >
+            <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+            <span className="text-[13px] font-medium">{label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
