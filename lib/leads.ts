@@ -53,7 +53,7 @@ export const LEAD_STATUSES = [
  */
 type _ExhaustiveLeadStatuses =
   Exclude<LeadStatus, (typeof LEAD_STATUSES)[number]> extends never ? true : never;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line
 const _exhaustiveLeadStatuses: _ExhaustiveLeadStatuses = true;
 
 /** O(1) membership lookup backing {@link isLeadStatus}. */

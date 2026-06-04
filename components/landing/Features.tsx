@@ -134,16 +134,19 @@ export function Features() {
 
       {/* Grid */}
       <div className="mx-auto max-w-5xl px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {FEATURES.map((f) => (
-          <div key={f.title} className="feature-card group cursor-default">
-            <div className="text-3xl mb-3">{f.icon}</div>
+        {FEATURES.map((f, i) => (
+          <div
+            key={f.title}
+            className="feature-card group cursor-default hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] p-6 rounded-2xl glow-card-green"
+          >
+            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 w-fit">{f.icon}</div>
             <h3
-              className="text-sm font-bold text-white mb-1.5"
+              className="text-sm font-bold text-white mb-2 tracking-wide"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {f.title}
             </h3>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+            <p className="text-xs leading-relaxed text-white/50 group-hover:text-white/70 transition-colors">
               {f.desc}
             </p>
           </div>

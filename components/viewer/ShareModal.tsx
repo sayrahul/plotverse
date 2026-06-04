@@ -73,7 +73,7 @@ export function ShareModal({
       >
         {/* Modal */}
         <motion.div
-          className="glass-dark w-full sm:max-w-sm mx-4 mb-4 sm:mb-0 rounded-2xl overflow-hidden"
+          className="glass-dark w-full sm:max-w-sm mx-4 mb-4 mb-safe sm:mb-0 rounded-2xl overflow-hidden"
           initial={{ y: 60, opacity: 0 }}
           animate={{ y: 0,  opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}

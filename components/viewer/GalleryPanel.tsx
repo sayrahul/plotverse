@@ -67,7 +67,7 @@ export function GalleryPanel({ project, onClose }: GalleryPanelProps) {
         <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
 
         {/* Grid */}
-        <div className="overflow-y-auto h-full pb-8 px-4 pt-4">
+        <div className="overflow-y-auto h-full pb-20 px-4 pt-4 pb-safe">
           {gallery.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3">
               <span className="text-4xl">🖼️</span>

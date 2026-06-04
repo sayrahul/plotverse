@@ -118,7 +118,7 @@ export function PlotDetailSheet({
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto h-full pb-8 px-5">
+        <div className="overflow-y-auto h-full pb-20 px-5 pb-safe">
           {/* Header row */}
           <div className="flex items-start justify-between mb-4">
             <div>

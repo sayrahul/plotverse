@@ -50,8 +50,7 @@ export function FilterPills({
 
   return (
     <div
-      className="ui-overlay absolute left-0 right-0 z-20 flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar"
-      style={{ top: "68px" }}
+      className="w-full flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar pointer-events-auto"
     >
       {pills.map((p) => (
         <button

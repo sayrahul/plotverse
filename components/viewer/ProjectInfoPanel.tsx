@@ -107,7 +107,7 @@ export function ProjectInfoPanel({ project, counts, onClose }: ProjectInfoPanelP
         <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto h-full pb-16 px-5 pt-4 space-y-5">
+        <div className="overflow-y-auto h-full pb-24 px-5 pt-4 space-y-5 pb-safe">
           {/* Project header */}
           <div className="flex items-center gap-4">
             <div

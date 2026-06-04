@@ -52,7 +52,7 @@ function normalizePrivateKey(raw: string): string {
 }
 
 /** True when the admin SDK should target the local emulator suite. */
-function useEmulator(): boolean {
+function shouldUseEmulator(): boolean {
   const flag =
     process.env.FIREBASE_USE_EMULATOR ??
     process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR;
@@ -72,7 +72,7 @@ function readAdminOptions(): AppOptions {
   // a project id is enough to route requests. The emulator host variables
   // (FIRESTORE_EMULATOR_HOST, FIREBASE_AUTH_EMULATOR_HOST,
   // FIREBASE_STORAGE_EMULATOR_HOST) are honored automatically by the SDK.
-  if (useEmulator()) {
+  if (shouldUseEmulator()) {
     return { projectId, storageBucket };
   }
 

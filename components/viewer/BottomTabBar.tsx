@@ -21,7 +21,7 @@ const TABS = [
 export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
   return (
     <div
-      className="ui-overlay absolute bottom-0 left-0 right-0 z-20 glass-dark px-4 pb-safe"
+      className="w-full glass-dark px-4"
       style={{ borderTop: "var(--glass-border)", borderRadius: "20px 20px 0 0" }}
     >
       <div className="flex items-center justify-around py-2">

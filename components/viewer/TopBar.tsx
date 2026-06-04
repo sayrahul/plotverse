@@ -28,7 +28,7 @@ export function TopBar({
 }: TopBarProps) {
   return (
     <div
-      className="ui-overlay absolute top-0 left-0 right-0 z-20 flex items-start justify-between px-4 pt-4 pb-2 pointer-events-none"
+      className="w-full flex items-start justify-between px-4 pt-3 pb-1 pointer-events-none"
     >
       {/* Left: project name + compass */}
       <div className="pointer-events-auto glass-pill px-4 py-2 flex items-center gap-3 max-w-[55vw]">

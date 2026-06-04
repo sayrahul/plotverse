@@ -54,7 +54,7 @@ function readClientConfig(): FirebaseOptions {
 }
 
 /** True when the client should connect to the local emulator suite. */
-function useEmulator(): boolean {
+function shouldUseEmulator(): boolean {
   const flag = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR;
   return flag === "true" || flag === "1";
 }
@@ -77,7 +77,7 @@ let storageInstance: FirebaseStorage | undefined;
 export function getClientFirestore(): Firestore {
   if (!firestoreInstance) {
     const db = getFirestore(getClientApp());
-    if (useEmulator()) {
+    if (shouldUseEmulator()) {
       const host = emulatorHost();
       connectFirestoreEmulator(db, host, 8080);
     }
@@ -90,7 +90,7 @@ export function getClientFirestore(): Firestore {
 export function getClientAuth(): Auth {
   if (!authInstance) {
     const auth = getAuth(getClientApp());
-    if (useEmulator()) {
+    if (shouldUseEmulator()) {
       const host = emulatorHost();
       connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
     }
@@ -103,7 +103,7 @@ export function getClientAuth(): Auth {
 export function getClientStorage(): FirebaseStorage {
   if (!storageInstance) {
     const storage = getStorage(getClientApp());
-    if (useEmulator()) {
+    if (shouldUseEmulator()) {
       const host = emulatorHost();
       connectStorageEmulator(storage, host, 9199);
     }

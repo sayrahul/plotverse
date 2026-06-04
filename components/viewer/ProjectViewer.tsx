@@ -258,38 +258,38 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
         />
       </div>
 
-      {/* z-20: Top bar */}
-      <TopBar
-        projectName={project.name}
-        is3D={is3D}
-        isPresentation={isPresentation}
-        onShare={() => setShowShareModal(true)}
-        onToggle3D={handleToggle3D}
-        onLocate={() => mapRef.current?.flyToCenter()}
-        onTogglePresentation={() => setIsPresentation((p) => !p)}
-      />
+      {/* Top Header Overlay (Notch Safe / No overlap) */}
+      <div className="ui-overlay absolute top-0 left-0 right-0 z-20 flex flex-col pointer-events-none pt-safe">
+        <TopBar
+          projectName={project.name}
+          is3D={is3D}
+          isPresentation={isPresentation}
+          onShare={() => setShowShareModal(true)}
+          onToggle3D={handleToggle3D}
+          onLocate={() => mapRef.current?.flyToCenter()}
+          onTogglePresentation={() => setIsPresentation((p) => !p)}
+        />
+        <FilterPills
+          counts={counts}
+          zones={zones}
+          statusGroups={statusGroups}
+          active={activeFilter}
+          onSelect={handleFilterSelect}
+        />
+      </div>
 
-      {/* z-20: Filter pills */}
-      <FilterPills
-        counts={counts}
-        zones={zones}
-        statusGroups={statusGroups}
-        active={activeFilter}
-        onSelect={handleFilterSelect}
-      />
+      {/* Bottom Controls Container (Home-Indicator Safe / No overlap) */}
+      <div className="ui-overlay absolute bottom-0 left-0 right-0 z-20 flex flex-col pointer-events-none pb-safe">
+        <SearchPlot
+          plots={plots}
+          userLocation={userLoc.location}
+          onSelect={selectPlot}
+        />
+        <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
+      </div>
 
-      {/* z-20: Search bar (above bottom tab bar) */}
-      <SearchPlot
-        plots={plots}
-        userLocation={userLoc.location}
-        onSelect={selectPlot}
-      />
-
-      {/* z-20: Bottom tab bar */}
-      <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
-
-      {/* z-50: WhatsApp FAB */}
-      <WhatsAppFAB project={project} />
+      {/* z-50: WhatsApp FAB (Hidden when sheets are open to avoid overlap) */}
+      {!selectedPlot && !activeTab && <WhatsAppFAB project={project} />}
 
       {/* z-30: Plot detail sheet */}
       {selectedPlot && (

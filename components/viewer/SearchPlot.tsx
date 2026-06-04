@@ -58,8 +58,7 @@ export function SearchPlot({ plots, userLocation, onSelect }: SearchPlotProps) {
 
   return (
     <div
-      className="ui-overlay absolute left-4 right-4 z-20"
-      style={{ bottom: "76px" }}
+      className="w-full px-4 py-2 pointer-events-auto"
     >
       {/* Search input */}
       <div

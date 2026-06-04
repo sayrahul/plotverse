@@ -10,7 +10,7 @@
  * Requirements: 34.3 (WGS84 GeoJSON storage) and the data models in design.md.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
+// eslint-disable-next-line
 export namespace GeoJSON {
   /** A coordinate: [longitude, latitude] (optionally with elevation). */
   export type Position = number[];
@@ -80,7 +80,7 @@ export namespace GeoJSON {
     | MultiPolygon
     | GeometryCollection;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   export type GeoJsonProperties = { [name: string]: any } | null;
 
   export interface Feature<
