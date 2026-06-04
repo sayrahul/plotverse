@@ -1,11 +1,11 @@
 {
   "project": {
     "id": "single",
-    "name": "My Simplified PlotVerse",
-    "description": "A simplified, static plot viewer.",
+    "name": "Shree Harikishan Nagar",
+    "description": "Proposed layout plan for Gat No. 34, 35 & 38/1 at Makranpur, Kannad.",
     "center": [
-      75.11887725,
-      20.27218985
+      0,
+      0
     ],
     "defaultZoom": 16,
     "labelFormat": "number+area",
@@ -21,59 +21,6 @@
     "createdAt": 1700000000000,
     "updatedAt": 1700000000000
   },
-  "plots": [
-    {
-      "id": "plot-test-0",
-      "projectId": "single",
-      "number": "P-1",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              75.1179944,
-              20.2716129
-            ],
-            [
-              75.1197601,
-              20.2712631
-            ],
-            [
-              75.1182913,
-              20.2731166
-            ],
-            [
-              75.1179944,
-              20.2716129
-            ]
-          ]
-        ]
-      },
-      "areaSqm": 16000,
-      "status": "available",
-      "centroid": [
-        75.11868193333333,
-        20.271997533333334
-      ],
-      "points": [
-        [
-          75.1179944,
-          20.2716129
-        ],
-        [
-          75.1197601,
-          20.2712631
-        ],
-        [
-          75.1182913,
-          20.2731166
-        ],
-        [
-          75.1179944,
-          20.2716129
-        ]
-      ]
-    }
-  ],
+  "plots": [],
   "zones": []
 }

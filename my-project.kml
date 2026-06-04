@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document id="root_doc">
+    <Folder>
+      <name>0</name>
+    </Folder>
+    <Document id="AMINITY">
+      <name>AMINITY</name>
+    </Document>
+    <Document id="CIRCLE_HATCH">
+      <name>CIRCLE_HATCH</name>
+    </Document>
+    <Document id="LAYOUT_PLAN">
+      <name>LAYOUT_PLAN</name>
+    </Document>
+    <Document id="OPEN_SPACE">
+      <name>OPEN_SPACE</name>
+    </Document>
+    <Document id="POINTS_LABELS">
+      <name>POINTS_LABELS</name>
+    </Document>
+  </Document>
+</kml>
