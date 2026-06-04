@@ -3,12 +3,18 @@
     "id": "single",
     "name": "My Simplified PlotVerse",
     "description": "A simplified, static plot viewer.",
-    "center": [73.8567, 18.5204],
+    "center": [
+      75.11887725,
+      20.27218985
+    ],
     "defaultZoom": 16,
     "labelFormat": "number+area",
     "contactPhone": "1234567890",
     "socialLinks": {},
-    "amenities": ["Water", "Electricity"],
+    "amenities": [
+      "Water",
+      "Electricity"
+    ],
     "gallery": [],
     "geojsonStoragePath": "",
     "geojsonHistory": [],
@@ -17,65 +23,57 @@
   },
   "plots": [
     {
-      "id": "plot-1",
+      "id": "plot-test-0",
       "projectId": "single",
-      "number": "A1",
+      "number": "P-1",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.1179944,
+              20.2716129
+            ],
+            [
+              75.1197601,
+              20.2712631
+            ],
+            [
+              75.1182913,
+              20.2731166
+            ],
+            [
+              75.1179944,
+              20.2716129
+            ]
+          ]
+        ]
+      },
+      "areaSqm": 16000,
       "status": "available",
-      "areaSqm": 120,
-      "centroid": [73.8567, 18.5204],
-      "price": 50000,
-      "facing": "East",
-      "amenities": ["Corner"],
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [73.8566, 18.5203],
-            [73.8568, 18.5203],
-            [73.8568, 18.5205],
-            [73.8566, 18.5205],
-            [73.8566, 18.5203]
-          ]
+      "centroid": [
+        75.11868193333333,
+        20.271997533333334
+      ],
+      "points": [
+        [
+          75.1179944,
+          20.2716129
+        ],
+        [
+          75.1197601,
+          20.2712631
+        ],
+        [
+          75.1182913,
+          20.2731166
+        ],
+        [
+          75.1179944,
+          20.2716129
         ]
-      }
-    },
-    {
-      "id": "plot-2",
-      "projectId": "single",
-      "number": "A2",
-      "status": "sold",
-      "areaSqm": 150,
-      "centroid": [73.8570, 18.5204],
-      "price": 60000,
-      "facing": "West",
-      "amenities": [],
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [73.8569, 18.5203],
-            [73.8571, 18.5203],
-            [73.8571, 18.5205],
-            [73.8569, 18.5205],
-            [73.8569, 18.5203]
-          ]
-        ]
-      }
+      ]
     }
   ],
-  "zones": [],
-  "statusGroups": [
-    {
-      "id": "all",
-      "projectId": "single",
-      "name": "All",
-      "statuses": ["available", "sold", "reserved", "blocked"]
-    },
-    {
-      "id": "available",
-      "projectId": "single",
-      "name": "Available",
-      "statuses": ["available"]
-    }
-  ]
+  "zones": []
 }
