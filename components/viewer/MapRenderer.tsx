@@ -113,6 +113,7 @@ function MapRendererImpl(
   const formatRef = useRef<LabelFormat>(project.labelFormat);
   const unitRef   = useRef<Unit>(unit);
   const centerRef = useRef(project.center);
+  const projectRef = useRef(project);
   const onPlotClickRef = useRef(onPlotClick);
   onPlotClickRef.current = onPlotClick;
 
@@ -205,6 +206,29 @@ function MapRendererImpl(
         data: buildPlotsFeatureCollection(plotsRef.current, formatRef.current, unitRef.current) as unknown as GeoJSON.FeatureCollection,
       });
     }
+    
+    const currentProject = projectRef.current;
+    if (currentProject.imageOverlay) {
+      if (!map.getSource("project-overlay")) {
+        map.addSource("project-overlay", {
+          type: "image",
+          url: currentProject.imageOverlay.url,
+          coordinates: currentProject.imageOverlay.coordinates,
+        });
+      }
+      if (!map.getLayer("project-overlay-layer")) {
+        map.addLayer({
+          id: "project-overlay-layer",
+          type: "raster",
+          source: "project-overlay",
+          paint: {
+            "raster-opacity": 0.85,
+            "raster-fade-duration": 0,
+          },
+        });
+      }
+    }
+
     for (const layer of buildLayerStack()) {
       if (!map.getLayer(layer.id)) map.addLayer(layer);
     }
@@ -388,8 +412,9 @@ function MapRendererImpl(
     formatRef.current = project.labelFormat;
     unitRef.current   = unit;
     writePlotsSource(buildPlotsFeatureCollection(plots, project.labelFormat, unit));
+    projectRef.current = project;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plots, project.labelFormat, unit]);
+  }, [plots, project.labelFormat, unit, project]);
 
   useEffect(() => {
     zonesRef.current = zones;

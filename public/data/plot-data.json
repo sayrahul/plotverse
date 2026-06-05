@@ -18,6 +18,15 @@
     "gallery": [],
     "geojsonStoragePath": "",
     "geojsonHistory": [],
+    "imageOverlay": {
+      "url": "/data/layout.jpg",
+      "coordinates": [
+        [75.118, 20.273],
+        [75.122, 20.273],
+        [75.122, 20.270],
+        [75.118, 20.270]
+      ]
+    },
     "createdAt": 1700000000000,
     "updatedAt": 1700000000000
   },

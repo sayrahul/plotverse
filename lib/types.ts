@@ -74,6 +74,15 @@ export interface Project {
   geojsonStoragePath: string; // current GeoJSON in Storage (Req 35.1)
   geojsonHistory: GeojsonVersion[]; // most recent 5 (Req 35.2)
   ogImageUrl?: string; // Req 31
+  imageOverlay?: {
+    url: string;
+    coordinates: [
+      [number, number], // Top Left
+      [number, number], // Top Right
+      [number, number], // Bottom Right
+      [number, number]  // Bottom Left
+    ]
+  };
   createdAt: number;
   updatedAt: number;
 }
