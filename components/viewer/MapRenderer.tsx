@@ -80,7 +80,7 @@ export interface MapRendererHandle {
 }
 
 export interface MapRendererProps {
-  project: Pick<Project, "center" | "defaultZoom" | "labelFormat">;
+  project: Pick<Project, "center" | "defaultZoom" | "labelFormat" | "imageOverlay">;
   plots:   readonly Plot[];
   zones:   readonly Zone[];
   unit:    Unit;
