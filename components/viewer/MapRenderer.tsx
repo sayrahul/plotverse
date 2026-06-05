@@ -305,7 +305,7 @@ function MapRendererImpl(
       const map = mapRef.current;
       if (!map) return;
       styleReadyRef.current = false;
-      map.setStyle(style === "satellite" ? MAP_STYLES.satellite : MAP_STYLES.street);
+      map.setStyle(style === "satellite" ? MAP_STYLES.satellite : MAP_STYLES.dark);
       map.once("style.load", () => handleStyleLoad(map));
     },
     flyToCenter() {
@@ -316,14 +316,28 @@ function MapRendererImpl(
     },
     fitBounds() {
       const map = mapRef.current;
-      if (!map || plotsRef.current.length === 0) return;
-      const lngs = plotsRef.current.map((p) => (p.centroid as [number, number])[0]);
-      const lats  = plotsRef.current.map((p) => (p.centroid as [number, number])[1]);
-      const bounds: LngLatBoundsLike = [
-        [Math.min(...lngs) - 0.001, Math.min(...lats) - 0.001],
-        [Math.max(...lngs) + 0.001, Math.max(...lats) + 0.001],
-      ];
-      map.fitBounds(bounds, { padding: 60, maxZoom: 18, duration: 800 });
+      if (!map) return;
+      let bounds: LngLatBoundsLike;
+      
+      const currentProject = projectRef.current;
+      if (currentProject.imageOverlay) {
+        const coords = currentProject.imageOverlay.coordinates;
+        const lngs = coords.map((c: number[]) => c[0]);
+        const lats = coords.map((c: number[]) => c[1]);
+        bounds = [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)]
+        ];
+        map.fitBounds(bounds, { padding: 40, duration: 800 });
+      } else if (plotsRef.current.length > 0) {
+        const lngs = plotsRef.current.map((p) => (p.centroid as [number, number])[0]);
+        const lats  = plotsRef.current.map((p) => (p.centroid as [number, number])[1]);
+        bounds = [
+          [Math.min(...lngs) - 0.001, Math.min(...lats) - 0.001],
+          [Math.max(...lngs) + 0.001, Math.max(...lats) + 0.001],
+        ];
+        map.fitBounds(bounds, { padding: 60, maxZoom: 18, duration: 800 });
+      }
     },
     setUserLocation(loc) { updateUserDot(loc); },
     setStatusColorsEnabled(enable) {
@@ -345,7 +359,7 @@ function MapRendererImpl(
       style: DEFAULT_MAP_STYLE,
       center: [lng, lat],
       zoom: project.defaultZoom,
-      pitch: 45,
+      pitch: 0,
       attributionControl: false,
       antialias: true,
     });

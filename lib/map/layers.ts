@@ -42,14 +42,14 @@ import type { PlotStatus } from "@/lib/types";
  * using these same constants.
  */
 export const MAP_STYLES = {
-  /** Satellite imagery with road/place labels — the default base map (Req 4.1). */
+  /** Satellite imagery with road/place labels. */
   satellite: "mapbox://styles/mapbox/satellite-streets-v12",
-  /** Vector street style used by the street-view toggle (Req 4.2). */
-  street: "mapbox://styles/mapbox/streets-v12",
+  /** Dark style used for the plain default map view. */
+  dark: "mapbox://styles/mapbox/dark-v11",
 } as const;
 
-/** The base map style shown on first load (Req 4.1). */
-export const DEFAULT_MAP_STYLE = MAP_STYLES.satellite;
+/** The base map style shown on first load. */
+export const DEFAULT_MAP_STYLE = MAP_STYLES.dark;
 
 // ---------------------------------------------------------------------------
 // Source and layer identifiers
