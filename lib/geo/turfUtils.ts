@@ -44,6 +44,10 @@ export function pointInPolygon(lngLat: number[], coordinates: number[][][]): boo
  * Used to render dimension labels on plot edges.
  */
 export interface EdgeDimension {
+  /** Start [lng, lat] of the edge. */
+  start: [number, number];
+  /** End [lng, lat] of the edge. */
+  end: [number, number];
   /** Midpoint [lng, lat] of the edge. */
   mid: [number, number];
   /** Length of the edge in metres. */
@@ -57,13 +61,13 @@ export function edgeDimensions(geometry: { coordinates: number[][][] }): EdgeDim
   if (!ring || ring.length < 3) return [];
   const dims: EdgeDimension[] = [];
   for (let i = 0; i < ring.length - 1; i++) {
-    const a = ring[i]!;
-    const b = ring[i + 1]!;
+    const a = ring[i] as [number, number];
+    const b = ring[i + 1] as [number, number];
     const line = turf.lineString([a, b]);
     const lengthM = turf.length(line, { units: "meters" });
     const mid = turf.midpoint(turf.point(a), turf.point(b)).geometry.coordinates as [number, number];
     const bear = turf.bearing(turf.point(a), turf.point(b));
-    dims.push({ mid, lengthM, bearing: bear });
+    dims.push({ start: a, end: b, mid, lengthM, bearing: bear });
   }
   return dims;
 }

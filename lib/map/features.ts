@@ -15,6 +15,7 @@
 import { GeoJSON } from "@/lib/geojson";
 import { formatPlotLabel } from "@/lib/labels";
 import { plotToFeature } from "@/lib/mapSource";
+import { formatArea } from "@/lib/units";
 import type { LabelFormat, Plot, Unit, Zone } from "@/lib/types";
 
 /**
@@ -36,6 +37,8 @@ export function plotToLabeledFeature(
     properties: {
       ...feature.properties,
       label: formatPlotLabel(plot, format, unit),
+      area_yd: formatArea(plot.areaSqm, "sqyd").replace("sq yd", "yd²"),
+      area_m: formatArea(plot.areaSqm, "sqm").replace("sq m", "m²"),
     },
   };
 }

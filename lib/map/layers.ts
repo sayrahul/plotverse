@@ -49,7 +49,7 @@ export const MAP_STYLES = {
 } as const;
 
 /** The base map style shown on first load. */
-export const DEFAULT_MAP_STYLE = MAP_STYLES.dark;
+export const DEFAULT_MAP_STYLE = MAP_STYLES.satellite;
 
 // ---------------------------------------------------------------------------
 // Source and layer identifiers
@@ -118,10 +118,7 @@ export function statusFillColor(status: PlotStatus | string): string {
  * is computed per-feature by the GPU without recreating the source on changes.
  */
 export function plotFillColorExpression(showStatusColors: boolean = true): ExpressionSpecification {
-  if (!showStatusColors) {
-    return ["literal", "#e5ddc5"] as ExpressionSpecification; // Tan color from the screenshot when status is off
-  }
-  return [
+  const baseColors = showStatusColors ? [
     "match",
     ["get", "status"],
     "available",
@@ -133,7 +130,14 @@ export function plotFillColorExpression(showStatusColors: boolean = true): Expre
     "blocked",
     STATUS_COLORS.blocked,
     UNKNOWN_STATUS_COLOR,
-  ];
+  ] : ["literal", "#e5ddc5"];
+
+  return [
+    "case",
+    ["boolean", ["feature-state", "selected"], false],
+    "#3b82f6", // Vivid blue for selected state
+    baseColors
+  ] as ExpressionSpecification;
 }
 
 /** Outline width (px) for an unselected plot. */
@@ -367,8 +371,20 @@ export function buildPlotLabelLayer(): SymbolLayerSpecification {
     type: "symbol",
     source: PLOTS_SOURCE_ID,
     layout: {
-      "text-field": ["coalesce", ["get", "label"], ""],
-      "text-size": 12,
+      "text-field": [
+        "case",
+        ["boolean", ["feature-state", "selected"], false],
+        [
+          "format",
+          ["to-string", ["get", "number"]], { "font-scale": 1.2 },
+          "\n", {},
+          ["to-string", ["get", "area_yd"]], { "font-scale": 0.8 },
+          "\n", {},
+          ["to-string", ["get", "area_m"]], { "font-scale": 0.8 }
+        ],
+        ["to-string", ["get", "number"]]
+      ],
+      "text-size": 14,
       "symbol-placement": "point",
     },
     paint: {

@@ -63,6 +63,8 @@ export interface MapRendererHandle {
   getMap(): MapboxMap | null;
   /** Fly to a plot's centroid and highlight it. */
   flyToPlot(plot: Plot): void;
+  /** Clear the current plot selection. */
+  clearSelection(): void;
   /** Apply a status/zone filter to the plot layers. */
   applyFilter(status: StatusFilter, zoneId?: string | null): void;
   /** Toggle 3D view on/off. */
@@ -115,6 +117,8 @@ function MapRendererImpl(
   const centerRef = useRef(project.center);
   const projectRef = useRef(project);
   const onPlotClickRef = useRef(onPlotClick);
+
+  const DIMENSIONS_SOURCE_ID = "dimensions-source";
   onPlotClickRef.current = onPlotClick;
 
   const plotsFcRef = useRef<GeoJSON.FeatureCollection<GeoJSON.Polygon>>({
@@ -149,28 +153,36 @@ function MapRendererImpl(
   // ── Dimension labels ────────────────────────────────────────────────────
 
   function clearDimLabels() {
-    dimMarkersRef.current.forEach((m) => m.remove());
-    dimMarkersRef.current = [];
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) return;
+    const src = map.getSource(DIMENSIONS_SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;
+    if (src) src.setData({ type: "FeatureCollection", features: [] });
   }
 
   function renderDimLabels() {
     const map = mapRef.current;
     if (!map || !styleReadyRef.current) return;
-    clearDimLabels();
-    if (map.getZoom() < 18) return;
-    for (const plot of plotsRef.current) {
-      const dims = edgeDimensions(plot.geometry);
-      for (const d of dims) {
-        const el = document.createElement("div");
-        el.className = "dimension-label";
-        el.textContent = `${d.lengthM.toFixed(1)}m`;
-        el.style.transform = `rotate(${d.bearing}deg)`;
-        const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
-          .setLngLat(d.mid)
-          .addTo(map);
-        dimMarkersRef.current.push(marker);
-      }
+    
+    if (map.getZoom() < 18 || selectedIdRef.current === null) {
+      clearDimLabels();
+      return;
     }
+    
+    const selectedPlot = plotsRef.current.find((p) => p.id === selectedIdRef.current);
+    if (!selectedPlot) {
+      clearDimLabels();
+      return;
+    }
+
+    const dims = edgeDimensions(selectedPlot.geometry);
+    const features: GeoJSON.Feature<GeoJSON.LineString>[] = dims.map((d) => ({
+      type: "Feature",
+      geometry: { type: "LineString", coordinates: [d.start, d.end] },
+      properties: { lengthM: `${d.lengthM.toFixed(1)} m` },
+    }));
+
+    const src = map.getSource(DIMENSIONS_SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;
+    if (src) src.setData({ type: "FeatureCollection", features });
   }
 
   // ── User location dot ───────────────────────────────────────────────────
@@ -222,7 +234,7 @@ function MapRendererImpl(
           type: "raster",
           source: "project-overlay",
           paint: {
-            "raster-opacity": 0.85,
+            "raster-opacity": 1.0,
             "raster-fade-duration": 0,
           },
         });
@@ -232,9 +244,69 @@ function MapRendererImpl(
     for (const layer of buildLayerStack()) {
       if (!map.getLayer(layer.id)) map.addLayer(layer);
     }
+
+    if (!map.getSource(DIMENSIONS_SOURCE_ID)) {
+      map.addSource(DIMENSIONS_SOURCE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] }
+      });
+    }
+
+    if (!map.getLayer("dimension-lines")) {
+      map.addLayer({
+        id: "dimension-lines",
+        type: "line",
+        source: DIMENSIONS_SOURCE_ID,
+        layout: {
+          "line-join": "round",
+          "line-cap": "round",
+        },
+        paint: {
+          "line-color": "rgba(255,255,255,0.7)",
+          "line-width": 1.5,
+          "line-dasharray": [3, 3],
+        }
+      });
+    }
+
+    if (!map.getLayer("dimension-labels")) {
+      map.addLayer({
+        id: "dimension-labels",
+        type: "symbol",
+        source: DIMENSIONS_SOURCE_ID,
+        layout: {
+          "symbol-placement": "line",
+          "text-field": ["get", "lengthM"],
+          "text-size": 11,
+          "text-offset": [0, -0.6],
+          "text-anchor": "bottom",
+          "text-keep-upright": true,
+        },
+        paint: {
+          "text-color": "rgba(255,255,255,0.95)",
+          "text-halo-color": "rgba(0,0,0,0.8)",
+          "text-halo-width": 1,
+        }
+      });
+    }
+
     styleReadyRef.current = true;
     rebuildSources();
     renderDimLabels();
+
+    // Auto-fit to overlay on style load
+    if (currentProject.imageOverlay) {
+      const coords = currentProject.imageOverlay.coordinates;
+      const lngs = coords.map((c: number[]) => c[0]);
+      const lats = coords.map((c: number[]) => c[1]);
+      map.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        { padding: 40, duration: 600 },
+      );
+    }
   }
 
   // ── Imperative handle ───────────────────────────────────────────────────
@@ -274,8 +346,18 @@ function MapRendererImpl(
       if (selectedIdRef.current !== null) {
         map.setFeatureState({ source: PLOTS_SOURCE_ID, id: selectedIdRef.current }, { selected: false });
       }
-      // We can't easily get the numeric feature id from the plot id here;
-      // the parent highlights by plot number through the source.
+      selectedIdRef.current = plot.id;
+      map.setFeatureState({ source: PLOTS_SOURCE_ID, id: plot.id }, { selected: true });
+      renderDimLabels();
+    },
+    clearSelection() {
+      const map = mapRef.current;
+      if (!map) return;
+      if (selectedIdRef.current !== null) {
+        map.setFeatureState({ source: PLOTS_SOURCE_ID, id: selectedIdRef.current }, { selected: false });
+        selectedIdRef.current = null;
+        renderDimLabels();
+      }
     },
     applyFilter(status, zoneId = null) {
       const map = mapRef.current;
@@ -364,6 +446,8 @@ function MapRendererImpl(
       antialias: true,
     });
     mapRef.current = map;
+    // Override Mapbox default grab cursor
+    map.getCanvas().style.cursor = "default";
 
     map.on("style.load", () => handleStyleLoad(map));
 
@@ -386,7 +470,23 @@ function MapRendererImpl(
         map.setFeatureState({ source: PLOTS_SOURCE_ID, id: hoveredIdRef.current }, { hover: false });
       }
       hoveredIdRef.current = null;
-      map.getCanvas().style.cursor = "";
+      map.getCanvas().style.cursor = "default";
+    });
+
+    // Pointer cursor on image overlay hover (for raster image interactivity)
+    map.on("mousemove", (e) => {
+      const vectorFeats = map.queryRenderedFeatures(e.point, { layers: [LAYER_IDS.plotFill] });
+      if (vectorFeats.length > 0) return; // already handled above
+      const { lng, lat } = e.lngLat;
+      const plots = plotsRef.current;
+      const hit = plots.some((plot) => {
+        const ring = plot.geometry.coordinates[0];
+        const lngs = ring.map((c: number[]) => c[0]);
+        const lats  = ring.map((c: number[]) => c[1]);
+        return lng >= Math.min(...lngs) && lng <= Math.max(...lngs) &&
+               lat >= Math.min(...lats) && lat <= Math.max(...lats);
+      });
+      map.getCanvas().style.cursor = hit ? "pointer" : "default";
     });
 
     // Click to select
@@ -403,7 +503,31 @@ function MapRendererImpl(
       if (id !== undefined) {
         map.setFeatureState({ source: PLOTS_SOURCE_ID, id }, { selected: true });
       }
+      renderDimLabels();
       if (plotId) onPlotClickRef.current?.(plotId);
+    });
+
+    // Fallback click: hit-test plots by lngLat for the image overlay
+    // (raster image layers don't emit feature events, so we do it manually)
+    map.on("click", (e) => {
+      // If we already handled a vector feature click above, skip
+      const vectorFeats = map.queryRenderedFeatures(e.point, { layers: [LAYER_IDS.plotFill] });
+      if (vectorFeats.length > 0) return;
+
+      const { lng, lat } = e.lngLat;
+      const plots = plotsRef.current;
+      for (const plot of plots) {
+        const ring = plot.geometry.coordinates[0];
+        const lngs = ring.map((c: number[]) => c[0]);
+        const lats  = ring.map((c: number[]) => c[1]);
+        if (
+          lng >= Math.min(...lngs) && lng <= Math.max(...lngs) &&
+          lat >= Math.min(...lats) && lat <= Math.max(...lats)
+        ) {
+          onPlotClickRef.current?.(plot.id);
+          return;
+        }
+      }
     });
 
     // Zoom → dimension labels

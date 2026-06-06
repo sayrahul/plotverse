@@ -34,6 +34,7 @@ import { PlotDetailSheet }    from "@/components/viewer/PlotDetailSheet";
 import { GalleryPanel }       from "@/components/viewer/GalleryPanel";
 import { ProjectInfoPanel }   from "@/components/viewer/ProjectInfoPanel";
 import { ShareModal }         from "@/components/viewer/ShareModal";
+import { PlotInfoOverlay }    from "@/components/viewer/PlotInfoOverlay";
 import { AddToHomeScreenPrompt } from "@/components/pwa/AddToHomeScreenPrompt";
 
 import type { MapRendererHandle } from "@/components/viewer/MapRenderer";
@@ -91,11 +92,12 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
   // UI state
   const [selectedPlot,     setSelectedPlot]     = useState<Plot | null>(null);
+  const [showDetailSheet,  setShowDetailSheet]  = useState(false);
   const [activeTab,        setActiveTab]         = useState<ActiveTab>(null);
   const [is3D,             setIs3D]              = useState(false);
   const [isPresentation,   setIsPresentation]    = useState(false);
   const [showShareModal,   setShowShareModal]    = useState(false);
-  const [mapStyleKey,      setMapStyleKey]       = useState<"satellite" | "dark">("dark");
+  const [mapStyleKey,      setMapStyleKey]       = useState<"satellite" | "dark">("satellite");
   const [showStatusColors, setShowStatusColors]  = useState(false);
 
   // ── Initial URL params ───────────────────────────────────────────────────
@@ -110,13 +112,13 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
   // ── Open plot from URL param once plots loaded ───────────────────────────
 
   useEffect(() => {
-    if (loading || plots.length === 0) return;
+    if (loading) return;
     const state = decodeViewerState(searchParams);
-    if (state.plot) {
+    if (state.plot && plots.length > 0) {
       const plot = plots.find((p) => p.id === state.plot || p.number === state.plot);
       if (plot) { selectPlot(plot); }
     }
-    // Fit bounds on first load
+    // Fit bounds on first load — works even with zero plots (image overlay)
     mapRef.current?.fitBounds();
   }, [loading]);  // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -178,13 +180,16 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
   const selectPlot = useCallback((plot: Plot) => {
     setSelectedPlot(plot);
+    setShowDetailSheet(false); // reset detail sheet on new selection
     mapRef.current?.flyToPlot(plot);
     updateURLParam("plot", plot.id);
   }, []);
 
   const deselectPlot = useCallback(() => {
     setSelectedPlot(null);
+    setShowDetailSheet(false);
     updateURLParam("plot", undefined);
+    mapRef.current?.clearSelection();
   }, []);
 
   const handleTabChange = useCallback((tab: ActiveTab) => {
