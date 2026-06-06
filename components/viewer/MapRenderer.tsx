@@ -297,8 +297,8 @@ function MapRendererImpl(
     // Auto-fit to overlay on style load
     if (currentProject.imageOverlay) {
       const coords = currentProject.imageOverlay.coordinates;
-      const lngs = coords.map((c: number[]) => c[0]);
-      const lats = coords.map((c: number[]) => c[1]);
+      const lngs = coords.map((c: number[]) => c[0]!);
+      const lats = coords.map((c: number[]) => c[1]!);
       map.fitBounds(
         [
           [Math.min(...lngs), Math.min(...lats)],
@@ -404,8 +404,8 @@ function MapRendererImpl(
       const currentProject = projectRef.current;
       if (currentProject.imageOverlay) {
         const coords = currentProject.imageOverlay.coordinates;
-        const lngs = coords.map((c: number[]) => c[0]);
-        const lats = coords.map((c: number[]) => c[1]);
+        const lngs = coords.map((c: number[]) => c[0]!);
+        const lats = coords.map((c: number[]) => c[1]!);
         bounds = [
           [Math.min(...lngs), Math.min(...lats)],
           [Math.max(...lngs), Math.max(...lats)]
@@ -427,7 +427,7 @@ function MapRendererImpl(
       if (!map || !styleReadyRef.current) return;
       map.setPaintProperty(LAYER_IDS.plotFill, "fill-color", plotFillColorExpression(enable));
     },
-  }), []);
+  }));
 
   // ── Map initialization ──────────────────────────────────────────────────
 
@@ -481,8 +481,9 @@ function MapRendererImpl(
       const plots = plotsRef.current;
       const hit = plots.some((plot) => {
         const ring = plot.geometry.coordinates[0];
-        const lngs = ring.map((c: number[]) => c[0]);
-        const lats  = ring.map((c: number[]) => c[1]);
+        if (!ring) return false;
+        const lngs = ring.map((c: number[]) => c[0]!);
+        const lats  = ring.map((c: number[]) => c[1]!);
         return lng >= Math.min(...lngs) && lng <= Math.max(...lngs) &&
                lat >= Math.min(...lats) && lat <= Math.max(...lats);
       });
@@ -518,8 +519,9 @@ function MapRendererImpl(
       const plots = plotsRef.current;
       for (const plot of plots) {
         const ring = plot.geometry.coordinates[0];
-        const lngs = ring.map((c: number[]) => c[0]);
-        const lats  = ring.map((c: number[]) => c[1]);
+        if (!ring) continue;
+        const lngs = ring.map((c: number[]) => c[0]!);
+        const lats  = ring.map((c: number[]) => c[1]!);
         if (
           lng >= Math.min(...lngs) && lng <= Math.max(...lngs) &&
           lat >= Math.min(...lats) && lat <= Math.max(...lats)

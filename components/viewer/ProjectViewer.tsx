@@ -97,7 +97,7 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
   const [is3D,             setIs3D]              = useState(false);
   const [isPresentation,   setIsPresentation]    = useState(false);
   const [showShareModal,   setShowShareModal]    = useState(false);
-  const [mapStyleKey,      setMapStyleKey]       = useState<"satellite" | "dark">("satellite");
+  const [mapStyleKey,      setMapStyleKey]       = useState<"satellite" | "street">("satellite");
   const [showStatusColors, setShowStatusColors]  = useState(false);
 
   // ── Initial URL params ───────────────────────────────────────────────────
@@ -216,7 +216,7 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
   }, [is3D]);
 
   const handleToggleMapStyle = useCallback(() => {
-    const nextStyle = mapStyleKey === "satellite" ? "dark" : "satellite";
+    const nextStyle = mapStyleKey === "satellite" ? "street" : "satellite";
     setMapStyleKey(nextStyle);
     mapRef.current?.switchStyle(nextStyle);
   }, [mapStyleKey]);
