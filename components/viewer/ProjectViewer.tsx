@@ -14,7 +14,7 @@
  */
 
 import dynamic from "next/dynamic";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type Ref } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
@@ -30,18 +30,24 @@ import { TopBar }             from "@/components/viewer/TopBar";
 import { StatusToggle }       from "@/components/viewer/StatusToggle";
 import { SearchPlot }         from "@/components/viewer/SearchPlot";
 import { BottomTabBar, type ActiveTab } from "@/components/viewer/BottomTabBar";
-import { PlotDetailSheet }    from "@/components/viewer/PlotDetailSheet";
 import { GalleryPanel }       from "@/components/viewer/GalleryPanel";
 import { ProjectInfoPanel }   from "@/components/viewer/ProjectInfoPanel";
 import { ShareModal }         from "@/components/viewer/ShareModal";
-import { PlotInfoOverlay }    from "@/components/viewer/PlotInfoOverlay";
 import { AddToHomeScreenPrompt } from "@/components/pwa/AddToHomeScreenPrompt";
 
-import type { MapRendererHandle } from "@/components/viewer/MapRenderer";
+import type { MapRendererHandle, MapRendererProps } from "@/components/viewer/MapRenderer";
 
 // Dynamic import for Mapbox (no SSR)
 const MapRenderer = dynamic(
-  () => import("@/components/viewer/MapRenderer").then((m) => m.MapRenderer),
+  () => import("@/components/viewer/MapRenderer").then((m) => {
+    const Renderer = m.MapRenderer;
+    return function DynamicMapRenderer(
+      props: MapRendererProps & { forwardedRef?: Ref<MapRendererHandle> },
+    ) {
+      const { forwardedRef, ...rendererProps } = props;
+      return <Renderer {...rendererProps} ref={forwardedRef} />;
+    };
+  }),
   { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#000" }} /> },
 );
 
@@ -92,7 +98,6 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
   // UI state
   const [selectedPlot,     setSelectedPlot]     = useState<Plot | null>(null);
-  const [showDetailSheet,  setShowDetailSheet]  = useState(false);
   const [activeTab,        setActiveTab]         = useState<ActiveTab>(null);
   const [is3D,             setIs3D]              = useState(false);
   const [isPresentation,   setIsPresentation]    = useState(false);
@@ -180,14 +185,12 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
 
   const selectPlot = useCallback((plot: Plot) => {
     setSelectedPlot(plot);
-    setShowDetailSheet(false); // reset detail sheet on new selection
     mapRef.current?.flyToPlot(plot);
     updateURLParam("plot", plot.id);
   }, []);
 
   const deselectPlot = useCallback(() => {
     setSelectedPlot(null);
-    setShowDetailSheet(false);
     updateURLParam("plot", undefined);
     mapRef.current?.clearSelection();
   }, []);
@@ -226,10 +229,6 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
     if (plot) selectPlot(plot);
   }
 
-  const zoneName = selectedPlot?.zoneId
-    ? zones.find((z) => z.id === selectedPlot.zoneId)?.name
-    : undefined;
-
   // ── Render ────────────────────────────────────────────────────────────────
 
   if (!project) {
@@ -248,7 +247,7 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
       {/* z-0: Map (full screen) */}
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
         <MapRenderer
-          ref={mapRef}
+          forwardedRef={mapRef}
           project={project}
           plots={plots}
           zones={zones}
@@ -314,24 +313,6 @@ export function ProjectViewer({ projectId, initialProject }: ProjectViewerProps)
         />
         <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
-
-
-
-      {/* z-30: Plot detail sheet */}
-      {selectedPlot && (
-        <div style={{ position: "absolute", inset: 0, zIndex: 30, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
-            <PlotDetailSheet
-              plot={selectedPlot}
-              project={project}
-              zoneName={zoneName}
-              onClose={deselectPlot}
-              onShare={() => setShowShareModal(true)}
-            />
-          </div>
-        </div>
-      )}
-
       {/* z-30: Gallery panel */}
       {activeTab === "gallery" && !selectedPlot && (
         <div style={{ position: "absolute", inset: 0, zIndex: 30, pointerEvents: "none" }}>

@@ -69,6 +69,7 @@ export const LAYER_IDS = {
   plotFill: "plot-fill",
   plotOutline: "plot-outline",
   plotLabel: "plot-label",
+  selectedPlotLabel: "selected-plot-label",
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -167,6 +168,7 @@ export function plotOutlineWidthExpression(): ExpressionSpecification {
 export const PLOT_FILL_OPACITY = 0.55;
 /** Plot fill opacity while hovered — brighter to give hover feedback (Req 8.1). */
 export const PLOT_FILL_OPACITY_HOVER = 0.8;
+export const PLOT_FILL_OPACITY_SELECTED = 0.96;
 
 /**
  * Builds the `fill-opacity` expression that brightens a plot while the pointer
@@ -180,6 +182,8 @@ export const PLOT_FILL_OPACITY_HOVER = 0.8;
 export function plotFillOpacityExpression(): ExpressionSpecification {
   return [
     "case",
+    ["boolean", ["feature-state", "selected"], false],
+    PLOT_FILL_OPACITY_SELECTED,
     ["boolean", ["feature-state", "hover"], false],
     PLOT_FILL_OPACITY_HOVER,
     PLOT_FILL_OPACITY,
@@ -227,6 +231,7 @@ export const FILTERABLE_PLOT_LAYER_IDS = [
   LAYER_IDS.plotFill,
   LAYER_IDS.plotOutline,
   LAYER_IDS.plotLabel,
+  LAYER_IDS.selectedPlotLabel,
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -374,22 +379,48 @@ export function buildPlotLabelLayer(): SymbolLayerSpecification {
       "text-field": [
         "case",
         ["boolean", ["feature-state", "selected"], false],
-        [
-          "format",
-          ["to-string", ["get", "number"]], { "font-scale": 1.2 },
-          "\n", {},
-          ["to-string", ["get", "area_yd"]], { "font-scale": 0.8 },
-          "\n", {},
-          ["to-string", ["get", "area_m"]], { "font-scale": 0.8 }
-        ],
+        "",
         ["to-string", ["get", "number"]]
       ],
       "text-size": 14,
       "symbol-placement": "point",
     },
     paint: {
+      "text-color": "#111827",
+      "text-halo-color": "rgba(255,255,255,0.65)",
+      "text-halo-width": 0.7,
+    },
+  };
+}
+
+export function buildSelectedPlotLabelLayer(): SymbolLayerSpecification {
+  return {
+    id: LAYER_IDS.selectedPlotLabel,
+    type: "symbol",
+    source: PLOTS_SOURCE_ID,
+    layout: {
+      "text-field": [
+        "case",
+        ["boolean", ["feature-state", "selected"], false],
+        [
+          "format",
+          ["to-string", ["get", "number"]], { "font-scale": 1.4 },
+          "\n", {},
+          ["to-string", ["get", "area_yd"]], { "font-scale": 0.62 },
+          "\n", {},
+          ["to-string", ["get", "area_m"]], { "font-scale": 0.78 }
+        ],
+        ""
+      ],
+      "text-size": 18,
+      "symbol-placement": "point",
+      "text-line-height": 0.92,
+      "text-allow-overlap": true,
+      "text-ignore-placement": true,
+    },
+    paint: {
       "text-color": "#ffffff",
-      "text-halo-color": "#111827",
+      "text-halo-color": "rgba(37,99,235,0.85)",
       "text-halo-width": 1.2,
     },
   };
@@ -422,5 +453,6 @@ export function buildLayerStack(): PlotVerseLayerSpec[] {
     buildPlotFillLayer(),
     buildPlotOutlineLayer(),
     buildPlotLabelLayer(),
+    buildSelectedPlotLabelLayer(),
   ];
 }
